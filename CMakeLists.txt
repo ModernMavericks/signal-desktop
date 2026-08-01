@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.16)
+
+# 10.9 target/arch, set before project() so it reaches the Porthole sub-build.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE STRING "Minimum macOS version")
+set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Target architectures")
+
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" MAVERICKS_SIGNAL_DESKTOP_VERSION LIMIT_COUNT 1)
+project(mavericks-signal-desktop VERSION ${MAVERICKS_SIGNAL_DESKTOP_VERSION} LANGUAGES OBJC)
+
+# This repo builds the Signal product's viewer: honest "Linux Signal" display name,
+# identity slug "signal-desktop". Set before add_subdirectory(porthole) so these CACHE values
+# win over the porthole sub-build's defaults.
+set(PORTHOLE_APP_NAME "Linux Signal" CACHE STRING "Display name for the generated viewer app")
+set(PORTHOLE_APP_SLUG "signal-desktop" CACHE STRING "App identity slug (bundle-id suffix + per-app behavior key)")
+
+# Explicit icon decision (forced by shared-cmake's mavericks_require_icon; the engine no
+# longer defaults to any app). Signal's icon is pulled at configure time from the running
+# signal-desktop-gui container -- never committed. (Build without it: -DMAVERICKS_ALLOW_GENERIC_ICON=ON.)
+set(PORTHOLE_ICON_CONTAINER "signal-desktop-gui" CACHE STRING "Container to extract the Signal icon from")
+set(PORTHOLE_ICON_GLOB "/usr/share/icons/hicolor/512x512/apps/signal-desktop.png"
+    CACHE STRING "In-container glob for the Signal icon PNG")
+
+# Shared mavericks-* build conventions (see github.com/ModernMavericks/shared-cmake).
+# Install the package once (`cmake --install`, self-registers in the user package
+# registry); then it is found with no CMAKE_PREFIX_PATH. CI installs it via the @v1 action.
+find_package(MavericksSharedCMake REQUIRED)
+set(MAVERICKS_REQUIRE_LANGS OBJC)
+include(Mavericks)
+
+enable_testing()
+find_program(BATS_EXECUTABLE bats)
+
+# The Porthole engine is a separate ingredient repo (a sibling checkout locally, an
+# installed package once published). Build its viewer for this product's GUI. Override the
+# location with -DPORTHOLE_DIR=… (or the SIGNAL_DESKTOP_APP env for bin/signal-desktop).
+set(PORTHOLE_DIR "${CMAKE_SOURCE_DIR}/../mavericks-porthole" CACHE PATH "Path to the porthole engine checkout")
+if(NOT EXISTS "${PORTHOLE_DIR}/viewer/CMakeLists.txt")
+  message(FATAL_ERROR "porthole engine not found at ${PORTHOLE_DIR} -- clone ModernMavericks/porthole as a sibling, or set -DPORTHOLE_DIR")
+endif()
+# Build the viewer at <binaryDir>/porthole/viewer/Porthole.app, exactly where the
+# generated bin/signal-desktop launcher looks ($_root/build-native-signal-desktop/porthole/viewer/).
+add_subdirectory("${PORTHOLE_DIR}/viewer" porthole/viewer)
+
+# Product BATS suite (the Signal container recipe + the generated launcher).
+if(BATS_EXECUTABLE)
+  file(GLOB _bats "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.bats")
+  foreach(_b IN LISTS _bats)
+    get_filename_component(_leaf "${_b}" NAME)
+    if(_leaf MATCHES "^\\._")
+      continue()
+    endif()
+    get_filename_component(_name "${_b}" NAME_WE)
+    add_test(NAME ${_name} COMMAND ${BATS_EXECUTABLE} "${_b}")
+    set_tests_properties(${_name} PROPERTIES WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+  endforeach()
+else()
+  message(STATUS "bats not found -- BATS suites won't run via ctest (install bats to enable)")
+endif()
+
+# `cmake --build . --target pkg` builds the installer (was `make pkg`).
+add_custom_target(pkg
+  COMMAND sh "${CMAKE_CURRENT_SOURCE_DIR}/packaging/macos/build_pkg.sh"
+             "${PROJECT_VERSION}" "mavericks-signal-desktop-${PROJECT_VERSION}.pkg"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  USES_TERMINAL
+  COMMENT "Building mavericks-signal-desktop-${PROJECT_VERSION}.pkg")
