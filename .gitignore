@@ -1,11 +1,9 @@
 docs/
 *.pkg
 .*.swp
-build*/
-
-# NOTE: unlike mavericks-1password (whose real launcher is the hand-written bin/op,
-# so it ignores the generated bin/1password), Signal's launcher IS the generated
-# bin/signal-desktop -- it is tracked, not ignored.
+# CMake/build OUTPUT dirs only -- NOT build/ (that holds the committed version wrappers).
+/_build/
+build-*/
 
 # Claude Code scratch dir (CLAUDE_CODE_TMPDIR)
 .tmp-claude/
