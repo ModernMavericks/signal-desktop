@@ -1,10 +1,9 @@
 #!/bin/sh
-# Refuse to install without Docker for Mavericks (docker-machine). The installer
-# runs scripts as root, whose PATH may omit /usr/local/bin, so check both.
-if ! command -v docker-machine >/dev/null 2>&1 \
-   && [ ! -x /usr/local/bin/docker-machine ]; then
-  echo "mavericks-signal needs Docker for Mavericks (docker-machine) installed first." >&2
-  echo "Install it (see the project README), then run this installer again." >&2
+# A Signal preset is inert without the Porthole engine, which materializes and runs the viewer.
+# The installer runs scripts as root (PATH may omit /usr/local/bin), so check both spellings.
+if [ ! -x /usr/local/bin/porthole ] && [ ! -d /Applications/Porthole.app ]; then
+  echo "mavericks-signal-desktop needs Porthole installed first (it provides the viewer engine)." >&2
+  echo "Install Porthole (https://github.com/ModernMavericks/porthole), then run this installer again." >&2
   exit 1
 fi
 exit 0
