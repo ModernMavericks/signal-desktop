@@ -13,3 +13,7 @@ build*/
 # macOS cruft (baseline parity with the other mavericks-* repos)
 ._*
 .DS_Store
+
+# Full version (<version>-mavericks.N): a build product, stamped at release. UPSTREAM_VERSION is committed.
+/VERSION
+/dist/

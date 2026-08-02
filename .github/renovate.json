@@ -1,4 +1,21 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ModernMavericks/shared-cmake"]
+  "extends": ["github>ModernMavericks/shared-cmake"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track Signal-Desktop stable releases into UPSTREAM_VERSION (the release name; the container floats to latest at first launch).",
+      "managerFilePatterns": ["/^UPSTREAM_VERSION$/"],
+      "matchStrings": ["^(?<currentValue>.+?)\\s*$"],
+      "depNameTemplate": "signalapp/Signal-Desktop",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDepNames": ["signalapp/Signal-Desktop"],
+      "allowedVersions": "!/-beta/"
+    }
+  ]
 }
