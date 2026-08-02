@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 # mavericks-signal-desktop is a Porthole PRESET: the .pkg ships only the Signal parameter set
-# (signal-desktop.conf); installing it asks the Porthole engine to materialize "Linux Signal.app".
+# (signal-desktop.conf); installing it asks the Porthole engine to materialize "Linux Signal Desktop.app".
 # There is no viewer build here.
 
 setup() {
@@ -37,12 +37,12 @@ teardown() { [ -n "$WORK" ] && rm -rf "$WORK"; }
   grep -q '/Library/Application Support/Porthole/presets/signal-desktop.conf' "$REPO/packaging/macos/scripts/postinstall"
 }
 
-@test "materialize turns the preset conf into Linux Signal.app" {
+@test "materialize turns the preset conf into Linux Signal Desktop.app" {
   [ -x "$PORTHOLE_REPO/bin/porthole" ] || skip "porthole engine not available as a sibling"
   PORTHOLE_MATERIALIZE_NO_ICON=1 "$PORTHOLE_REPO/bin/porthole" \
     materialize "$REPO/signal-desktop.conf" --apps-dir "$WORK/apps"
-  [ -d "$WORK/apps/Linux Signal.app" ]
-  [ -x "$WORK/apps/Linux Signal.app/Contents/Resources/bin/signal-desktop" ]
-  grep -q 'Applications/Porthole.app' "$WORK/apps/Linux Signal.app/Contents/Resources/bin/signal-desktop"
-  [ -f "$WORK/apps/Linux Signal.app/Contents/Resources/signal-desktop/Dockerfile" ]
+  [ -d "$WORK/apps/Linux Signal Desktop.app" ]
+  [ -x "$WORK/apps/Linux Signal Desktop.app/Contents/Resources/bin/signal-desktop" ]
+  grep -q 'Applications/Porthole.app' "$WORK/apps/Linux Signal Desktop.app/Contents/Resources/bin/signal-desktop"
+  [ -f "$WORK/apps/Linux Signal Desktop.app/Contents/Resources/signal-desktop/Dockerfile" ]
 }

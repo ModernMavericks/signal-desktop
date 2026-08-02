@@ -79,7 +79,7 @@ jobs:
           NOTES="$(sh build/release-notes-file.sh "${{ steps.ver.outputs.version }}" "${{ steps.ver.outputs.version }}" || true)"
           if [ -n "$NOTES" ] && [ -s "$NOTES" ]; then cp "$NOTES" dist/RELEASE_NOTES.md
           elif [ -s release-notes/README.md ]; then cp release-notes/README.md dist/RELEASE_NOTES.md
-          else printf '## Linux Signal %s\n\nAutomated release.\n' "${{ steps.ver.outputs.version }}" > dist/RELEASE_NOTES.md; fi
+          else printf '## Linux Signal Desktop %s\n\nAutomated release.\n' "${{ steps.ver.outputs.version }}" > dist/RELEASE_NOTES.md; fi
 
       - uses: actions/upload-artifact@v7
         with:

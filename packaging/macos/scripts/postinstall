@@ -1,5 +1,5 @@
 #!/bin/sh
-# Materialize "Linux Signal.app" from the preset conf. Runs as root at install time with no Docker,
+# Materialize "Linux Signal Desktop.app" from the preset conf. Runs as root at install time with no Docker,
 # so --no-icon builds the .app structure now (generic icon); the container image + the real Signal
 # icon resolve on first launch, as the user.
 set -eu

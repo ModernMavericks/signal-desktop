@@ -1,7 +1,7 @@
 #!/bin/sh
 # Build the mavericks-signal-desktop PRESET .pkg. A preset ships only the Signal parameter set
 # (signal-desktop.conf, + an optional menu.json); its postinstall asks the installed Porthole engine
-# to materialize "Linux Signal.app" on the Mac (the whole container recipe + launcher are rendered
+# to materialize "Linux Signal Desktop.app" on the Mac (the whole container recipe + launcher are rendered
 # there from templates by `porthole materialize`). No compiler, no viewer, no container here.
 # Usage: build_pkg.sh <version> <out.pkg>
 set -eu

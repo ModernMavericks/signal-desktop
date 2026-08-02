@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-    <title>Linux Signal (Porthole preset)</title>
+    <title>Linux Signal Desktop (Porthole preset)</title>
     <options customize="never" require-scripts="false"/>
     <volume-check>
         <allowed-os-versions><os-version min="10.9"/></allowed-os-versions>
     </volume-check>
     <choices-outline><line choice="default"/></choices-outline>
-    <choice id="default" title="Linux Signal">
+    <choice id="default" title="Linux Signal Desktop">
         <pkg-ref id="dev.modernmavericks.signal-desktop"/>
     </choice>
     <pkg-ref id="dev.modernmavericks.signal-desktop" version="0">mavericks-signal-desktop-component.pkg</pkg-ref>
