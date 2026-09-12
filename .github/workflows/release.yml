@@ -86,14 +86,15 @@ jobs:
           sh packaging/macos/build_pkg.sh "${{ steps.ver.outputs.version }}" \
              "dist/mavericks-signal-desktop-${{ steps.ver.outputs.version }}.pkg"
 
-      - name: Collect the release-notes body into the artifact
+      # publish-release.yml uses dist/RELEASE_NOTES.md as the Release body (and fails on an empty
+      # one). The .pkg's own installer floor (packaging/macos/distribution.xml) is bare 10.9 --
+      # --min-os here says what this pkg actually declares.
+      - name: Generate release notes
         run: |
           set -eu
-          # publish-release.yml uses this as the Release body (and fails on an empty one).
-          NOTES="$(sh build/release-notes-file.sh "${{ steps.ver.outputs.version }}" "${{ steps.ver.outputs.version }}" || true)"
-          if [ -n "$NOTES" ] && [ -s "$NOTES" ]; then cp "$NOTES" dist/RELEASE_NOTES.md
-          elif [ -s release-notes/README.md ]; then cp release-notes/README.md dist/RELEASE_NOTES.md
-          else printf '## Linux Signal Desktop %s\n\nAutomated release.\n' "${{ steps.ver.outputs.version }}" > dist/RELEASE_NOTES.md; fi
+          sh "$SHIPYARD_SCRIPTS/release-notes.sh" \
+            --tag "${{ steps.ver.outputs.version }}" --version "${{ steps.ver.outputs.version }}" \
+            --product 'Linux Signal Desktop' --min-os 10.9 --out dist/RELEASE_NOTES.md
 
       - uses: actions/upload-artifact@v7
         with:
